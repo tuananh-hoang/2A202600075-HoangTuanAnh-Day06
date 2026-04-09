@@ -17,7 +17,7 @@ from langgraph.graph import END, StateGraph
 from langgraph.graph.message import add_messages
 
 from app.core import config
-from app.prompts.system_prompt import ANSWER_PROMPT, CLASSIFY_PROMPT, ESCALATE_PROMPT
+from app.prompts.system_prompt_v3 import ANSWER_PROMPT, CLASSIFY_PROMPT, ESCALATE_PROMPT
 from app.utils.retrieval_advanced import HybridRAGRetriever
 
 logger = logging.getLogger(__name__)

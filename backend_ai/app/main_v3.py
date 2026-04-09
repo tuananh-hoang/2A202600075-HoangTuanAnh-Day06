@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Loading RAG agent...")
-    from app.core.agent_graph import app_graph, get_retriever  # noqa
+    from app.core.agent_graph_v3 import app_graph, get_retriever  # noqa
     get_retriever()   # trigger FAISS + reranker load ngay khi startup
     logger.info("RAG agent ready.")
     yield
@@ -89,7 +89,7 @@ async def chat(query: ChatQuery):
     thread_id = query.thread_id or str(uuid.uuid4())
 
     try:
-        from app.core.agent_graph import app_graph
+        from app.core.agent_graph_v3 import app_graph
 
         result = app_graph.invoke(
             {"messages": [HumanMessage(content=query.message)]},
