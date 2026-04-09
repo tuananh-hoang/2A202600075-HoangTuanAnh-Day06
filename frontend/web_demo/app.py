@@ -175,13 +175,24 @@ st.markdown(f"""
     /* Adaptive Source Tags */
     .source-tag {{
         display: inline-block;
-        padding: 2px 10px;
-        margin: 5px 5px 0 0;
-        background: rgba(0, 204, 187, 0.05);
-        border: 1px solid rgba(0, 204, 187, 0.2);
-        border-radius: 15px;
-        font-size: 0.75rem;
+        padding: 4px 12px;
+        margin: 5px 8px 5px 0;
+        background: rgba(0, 204, 187, 0.08);
+        border: 1px solid rgba(0, 204, 187, 0.3);
+        border-radius: 12px;
+        font-size: 0.8rem;
         color: var(--xanh-primary);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }}
+
+    .source-tag:hover {{
+        background: var(--xanh-primary);
+        color: white !important;
+        border-color: var(--xanh-primary);
+        box-shadow: 0 4px 12px rgba(0, 204, 187, 0.2);
+        transform: translateY(-1px);
     }}
 
     /* Clean UI */
@@ -272,8 +283,17 @@ for idx, msg in enumerate(st.session_state.messages):
             if sources:
                 st.markdown('<div style="margin-top: 10px; font-weight: 600; font-size: 0.85rem;">📚 Nguồn tham khảo:</div>', unsafe_allow_html=True)
                 for source in sources:
-                    title = source.get("title", "") if isinstance(source, dict) else source
-                    st.markdown(f'<span class="source-tag">{title}</span>', unsafe_allow_html=True)
+                    if isinstance(source, dict):
+                        title = source.get("title", "")
+                        url = source.get("url", "")
+                    else:
+                        title = source
+                        url = ""
+                    
+                    if url:
+                        st.markdown(f'<a href="{url}" target="_blank" class="source-tag">🔗 {title}</a>', unsafe_allow_html=True)
+                    else:
+                        st.markdown(f'<span class="source-tag">{title}</span>', unsafe_allow_html=True)
             
             # Path 3: Feedback Buttons (Right Aligned)
             st.markdown('<div class="feedback-container">', unsafe_allow_html=True)

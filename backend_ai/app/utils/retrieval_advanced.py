@@ -38,12 +38,13 @@ class _Candidate:
     Đơn vị nội bộ trong pipeline trước khi chuyển sang LangChain Document.
     Dùng class thay dataclass để tránh conflict với Pydantic của BaseRetriever.
     """
-    __slots__ = ("chunk_id", "section_title", "content", "score")
+    __slots__ = ("chunk_id", "section_title", "content", "url", "score")
 
-    def __init__(self, chunk_id: int, section_title: str, content: str, score: float = 0.0):
+    def __init__(self, chunk_id: int, section_title: str, content: str, url: str = "", score: float = 0.0):
         self.chunk_id = chunk_id
         self.section_title = section_title
         self.content = content
+        self.url = url
         self.score = score
 
 
@@ -151,9 +152,14 @@ class HybridRAGRetriever(BaseRetriever):
             self._faiss_row_to_chunk_id = {int(r[0]): int(r[1]) for r in rows}
 
             # Load tất cả chunks để build BM25 và cache nội dung
-            # ORDER BY id để index BM25 đồng nhất với _bm25_idx_to_chunk_id
+            # JOIN với documents để lấy source_path (URL)
             chunk_rows = conn.execute(
-                "SELECT id, section_title, content FROM chunks ORDER BY id"
+                """
+                SELECT c.id, c.section_title, c.content, d.source_path 
+                FROM chunks c
+                JOIN documents d ON c.document_id = d.id
+                ORDER BY c.id
+                """
             ).fetchall()
 
         finally:
@@ -162,7 +168,7 @@ class HybridRAGRetriever(BaseRetriever):
         tokenized_corpus: list[list[str]] = []
         self._bm25_idx_to_chunk_id = []
 
-        for chunk_id, section_title, content in chunk_rows:
+        for chunk_id, section_title, content, url in chunk_rows:
             chunk_id = int(chunk_id)
             section_title = section_title or ""
             content = content or ""
@@ -172,6 +178,7 @@ class HybridRAGRetriever(BaseRetriever):
                 chunk_id=chunk_id,
                 section_title=section_title,
                 content=content,
+                url=url or "",
             )
 
             # BM25: tokenize đơn giản bằng whitespace
@@ -289,6 +296,7 @@ class HybridRAGRetriever(BaseRetriever):
                     metadata={
                         "source": cand.section_title,
                         "chunk_id": cand.chunk_id,
+                        "url": cand.url,
                         "rerank_score": round(cand.score, 4),
                     },
                 )

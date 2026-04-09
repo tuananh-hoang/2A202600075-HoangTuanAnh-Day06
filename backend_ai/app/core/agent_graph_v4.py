@@ -167,6 +167,7 @@ def retrieve_node(state: AgentState) -> dict:
         parts.append(f"[{i}] {source_title}\n{chunk.page_content}")
         sources.append({
             "title": source_title,
+            "url": chunk.metadata.get("url", ""),
             "chunk_id": chunk.metadata.get("chunk_id", -1),
             "rerank_score": chunk.metadata.get("rerank_score", 0.0),
         })

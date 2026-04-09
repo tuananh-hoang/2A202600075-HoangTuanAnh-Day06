@@ -47,6 +47,7 @@ class ChatQuery(BaseModel):
 
 class SourceItem(BaseModel):
     title: str
+    url: Optional[str] = None
     chunk_id: int = -1
     rerank_score: float = 0.0
 
@@ -123,6 +124,7 @@ async def chat(query: ChatQuery):
             if isinstance(s, dict):
                 sources.append(SourceItem(
                     title=str(s.get("title", "Tài liệu Xanh SM")),
+                    url=str(s.get("url", "")),
                     chunk_id=int(s.get("chunk_id", -1)),
                     rerank_score=float(s.get("rerank_score", 0.0))
                 ))
