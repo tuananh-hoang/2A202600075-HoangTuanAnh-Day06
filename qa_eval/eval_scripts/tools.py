@@ -14,8 +14,8 @@ def evaluate_semantic_similarity(bot_response: str, expected_answer: str):
     Input: bot_response (str), expected_answer (str)
     Output: {score: float, verdict: str}
     """
-    v_bot = embeddings_model.embed_query(bot_response)
-    v_truth = embeddings_model.embed_query(expected_answer)
+    v_bot = embeddings_model.encode(bot_response)
+    v_truth = embeddings_model.encode(expected_answer)
     raw_score = compute_cosine_similarity(v_bot, v_truth)
     final_score = round(float(raw_score) * 100, 2)
     return {
