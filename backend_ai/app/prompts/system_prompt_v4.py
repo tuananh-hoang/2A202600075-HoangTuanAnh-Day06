@@ -42,18 +42,17 @@ PHÂN LOẠI QUERY TYPE:
 - general: Chào hỏi, câu hỏi chung không thuộc các nhóm trên.
 
 ─────────────────────────────────────
-NEEDS_CLARIFICATION = true KHI:
-
-- user_persona = driver VÀ query_type = incident VÀ câu hỏi mơ hồ về loại sự cố
-  Ví dụ: "khách không chịu xuống xe" → hỏi: "Chuyến đi đã hoàn thành chưa ạ?"
-  Ví dụ: "bị khiếu nại" → hỏi: "Quý đối tác đang bị khiếu nại về vấn đề gì?"
-
-- user_persona = prospect VÀ câu hỏi quá rộng, không rõ họ muốn biết gì
-  Ví dụ: "cho hỏi về Xanh SM" → hỏi: "Bạn đang tìm hiểu để đăng ký chạy xe hay có câu hỏi khác ạ?"
+NEEDS_CLARIFICATION = true CHỈ KHI câu hỏi có ÍT HƠN 4 từ VÀ không rõ chủ đề.
+  Ví dụ: "hành lý?", "phí?", "xe gì?" → hỏi lại
 
 KHÔNG hỏi lại khi:
-- policy query rõ ràng (driver)
-- recruitment query có đủ thông tin để tư vấn (prospect)"""
+- Câu hỏi đã mô tả tình huống cụ thể dù dài hay ngắn
+  Ví dụ: "nước hoa bị vỡ có bồi thường không" → ĐỦ RÕ, không hỏi lại
+  Ví dụ: "khách không xuống xe thì làm sao" → ĐỦ RÕ, không hỏi lại
+- Câu hỏi đã có đủ context để retrieve tài liệu
+- User vừa trả lời câu hỏi làm rõ trước đó → TUYỆT ĐỐI không hỏi lại lần nữa
+"""
+
 
 
 # ──────────────────────────────────────────────

@@ -10,7 +10,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- CONFIGURATION ---
+# BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000/chat")
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000/chat")
+
 BRAND_COLOR = "#00CCBB"
 LOGO_URL = "https://www.xanhsm.com/wp-content/uploads/2023/04/Logo-Xanh-SM.png"
 
@@ -231,7 +233,8 @@ for idx, msg in enumerate(st.session_state.messages):
             if sources:
                 st.markdown('<div style="margin-top: 10px; font-weight: 600; font-size: 0.85rem;">📚 Nguồn tham khảo:</div>', unsafe_allow_html=True)
                 for source in sources:
-                    st.markdown(f'<span class="source-tag">{source}</span>', unsafe_allow_html=True)
+                    title = source.get("title", "") if isinstance(source, dict) else source
+                    st.markdown(f'<span class="source-tag">{title}</span>', unsafe_allow_html=True)
 
 # --- CHAT INPUT ---
 if prompt := st.chat_input("Hỏi về quy định, chính sách..."):
@@ -255,7 +258,7 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] == "user"
                 response = requests.post(
                     BACKEND_URL,
                     json={
-                        "prompt": last_prompt,
+                        "message": last_prompt,
                         "thread_id": st.session_state.thread_id
                     },
                     timeout=30
@@ -263,7 +266,7 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] == "user"
                 
                 if response.status_code == 200:
                     data = response.json()
-                    answer = data.get("answer", "Dạ, tôi chưa có thông tin cụ thể về vấn đề này.")
+                    answer = data.get("reply", "Dạ, tôi chưa có thông tin cụ thể về vấn đề này.")
                     sources = data.get("sources", [])
                     
                     st.markdown(answer)
