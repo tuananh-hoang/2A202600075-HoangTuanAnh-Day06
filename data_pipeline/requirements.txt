@@ -1,4 +1,3 @@
-beautifulsoup4
 requests
 pandas
 openpyxl
@@ -7,3 +6,7 @@ llama-parse
 python-dotenv
 qdrant-client
 sentence-transformers
+playwright
+faiss-cpu
+numpy
+langchain_text_splitters
