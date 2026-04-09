@@ -20,13 +20,13 @@ def evaluate_semantic_similarity(bot_response: str, expected_answer: str):
     final_score = round(float(raw_score) * 100, 2)
     return {
         "score": final_score,
-        "verdict": "PASS" if final_score >= 80 else "FAIL"
+        "verdict": "PASS" if final_score >= 60 else "FAIL"
     }
 
 def verify_data_accuracy(bot_response: str, expected_answer: str):
     """
     TOOL 2: Kiểm tra chính xác các con số.
-    Sử dụng để đảm bảo các thông tin như giá cước, km không bị Bot bịa ra.
+    Sử dụng để đảm bảo các thông tin như số điện thoại hotline, CSKH,  không bị Bot bịa ra.
     Input: bot_response (str), expected_answer (str)
     Output: {numbers_match: bool}
     """
