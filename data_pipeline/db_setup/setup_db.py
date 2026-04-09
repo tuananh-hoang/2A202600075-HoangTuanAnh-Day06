@@ -21,6 +21,22 @@ CHUNKS_JSONL_DEFAULT = Path(__file__).resolve().parents[1] / "processed_data" / 
 SQLITE_PATH_DEFAULT = Path(__file__).resolve().parent / "knowledge_base.sqlite"
 FAISS_PATH_DEFAULT = Path(__file__).resolve().parent / "knowledge_base.faiss"
 MODEL_NAME_DEFAULT = "paraphrase-multilingual-MiniLM-L12-v2"
+GENERAL_TERMS_BASE_URL = "https://www.xanhsm.com/terms-policies/general?terms="
+PRICE_NEWS_URL = "https://www.xanhsm.com/news/gia-taxi-xanh-sm-bao-nhieu"
+
+
+def resolve_source_url(filename: str, fallback_path: str) -> str:
+    stem = Path(filename).stem
+    prefix = stem.split("_", 1)[0]
+
+    if prefix.isdigit():
+        file_number = int(prefix)
+        if 1 <= file_number <= 15:
+            return f"{GENERAL_TERMS_BASE_URL}{file_number}"
+        if file_number == 16:
+            return PRICE_NEWS_URL
+
+    return fallback_path
 
 
 def load_jsonl(path: Path) -> List[Dict[str, object]]:
@@ -248,7 +264,7 @@ def main() -> None:
         for item in raw_chunks:
             doc_id = str(item["doc_id"])
             filename = str(item["filename"])
-            source_path = str(item["source_path"])
+            source_path = resolve_source_url(filename=filename, fallback_path=str(item["source_path"]))
             chunk_index = int(item["chunk_index"])
             section_title = str(item.get("section_title", ""))
             section_chunk_index = int(item.get("section_chunk_index", 0))
