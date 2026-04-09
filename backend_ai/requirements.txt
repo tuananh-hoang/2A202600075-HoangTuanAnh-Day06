@@ -4,9 +4,7 @@ pydantic
 openai
 langchain
 langchain-community
-langchain-openai
-qdrant-client
+langgraph
+faiss-cpu
+sentence-transformers
 python-dotenv
-python-multipart
-ragas
-trulens-eval
