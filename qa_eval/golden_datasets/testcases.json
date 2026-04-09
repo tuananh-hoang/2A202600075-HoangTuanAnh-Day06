@@ -1,0 +1,282 @@
+[
+    {
+        "id": "TC_001",
+        "category": "Quy định hành lý",
+        "question": "Tôi đặt Xanh Bike nhưng mang theo một thùng hàng cồng kềnh phía sau. Tài xế có quyền từ chối chở tôi không?",
+        "expected_answer": "Có. Đối tác (Tài xế) có quyền từ chối cung cấp Sản Phẩm nếu Người dùng mang theo đồ vật quá khổ mà Đối tác đánh giá là có khả năng vi phạm quy định pháp luật về giao thông hoặc không đảm bảo nguyên tắc an toàn.",
+        "source": "6_quy_chế_sử_dụng_sản_phẩm_xanh_bike.md, Mục 3.3"
+    },
+    {
+        "id": "TC_002",
+        "category": "Xanh Express - Hàng cấm",
+        "question": "Tôi muốn gửi một thỏi vàng nhỏ qua dịch vụ Xanh Express có được không?",
+        "expected_answer": "Không. Xanh Express quy định Người dùng không được gửi kim loại quý (vàng, bạc, v.v… ở dạng thỏi, nén, tiền xu, v.v…).",
+        "source": "7_quy_chế_sử_dụng_sản_phẩm_xanh_express.md, Mục 3.1.2 (b)"
+    },
+    {
+        "id": "TC_003",
+        "category": "Tài khoản Gia đình",
+        "question": "Tôi là chủ nhóm Tài khoản Gia đình, tôi có thể đặt dịch vụ Xanh Ngon (Giao đồ ăn) cho con tôi bằng nguồn tiền chung không?",
+        "expected_answer": "Không. Tất cả Thành viên thuộc Tài khoản Gia Đình chỉ có thể sử dụng các dịch vụ chuyến xe vận chuyển hành khách.",
+        "source": "9_quy_chế_sử_dụng_tài_khoản_gia_đình.md, Điều kiện và điều khoản cho Chủ tài khoản, Khoản 2"
+    },
+    {
+        "id": "TC_004",
+        "category": "Hủy đơn Xanh Ngon",
+        "question": "Nếu tôi đặt món trên Xanh Ngon, đơn đã xác nhận nhưng tôi bận đột xuất nên muốn hủy hoặc không ra nhận hàng thì có bị sao không?",
+        "expected_answer": "Theo quy định, sau khi đơn hàng được xác nhận, bạn đồng ý sẽ không hủy đơn. Nếu bạn hủy đơn hoặc từ chối nhận hàng, Xanh SM có quyền yêu cầu bạn thanh toán toàn bộ giá trị đơn hàng. Đồng thời, tài khoản của bạn có thể bị vô hiệu hóa phương thức 'Thanh toán khi nhận hàng' trong một thời hạn nhất định.",
+        "source": "10_quy_chế_sử_dụng_sản_phẩm_xanh_ngon.md, Mục 6.1"
+    },
+    {
+        "id": "TC_005",
+        "category": "Bảo hiểm Xanh Express",
+        "question": "Tôi gửi một xấp tài liệu quan trọng qua Xanh Express và có mua Gói bảo hiểm Vàng. Nếu tài xế làm mất, mức bồi thường tối đa tôi nhận được là bao nhiêu?",
+        "expected_answer": "Đối với hàng hóa là 'Tài liệu', mức bồi thường tối đa cho Gói Vàng là 1.000.000 VNĐ trên mỗi đơn hàng/điểm giao hàng.",
+        "source": "7_quy_chế_sử_dụng_sản_phẩm_xanh_express.md, Phần Quy định về mức bồi thường Bảo hiểm (Bảng mức bồi thường tối đa của mỗi gói Bảo Hiểm)"
+    },
+    {
+        "id": "TC_006",
+        "category": "Trách nhiệm Tài xế",
+        "question": "Trong trường hợp xảy ra va chạm giao thông khi đang chở khách, ai là người chịu trách nhiệm trước pháp luật về việc bảo đảm an toàn cho phương tiện?",
+        "expected_answer": "Đối tác (Tài xế) là người điều khiển phương tiện phải chịu trách nhiệm trước pháp luật về việc bảo đảm an toàn cho phương tiện.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 3.3"
+    },
+    {
+        "id": "TC_007",
+        "category": "Xanh Express - Thời gian hoàn hàng",
+        "question": "Nếu đơn hàng Xanh Express giao không thành công, tài xế phải làm gì?",
+        "expected_answer": "Đối tác phải liên hệ với Người dùng để hoàn hàng với Đơn Hàng giao thất bại.",
+        "source": "7_quy_chế_sử_dụng_sản_phẩm_xanh_express.md, Mục 2, Bước 3"
+    },
+    {
+        "id": "TC_008",
+        "category": "Quy định tuổi tác",
+        "question": "Con tôi 16 tuổi có được tự tạo tài khoản và tham gia vào Tài khoản Gia đình của tôi không?",
+        "expected_answer": "Được, nếu có sự đồng ý của người giám hộ hợp pháp. Chủ tài khoản (người giám hộ) phải chịu trách nhiệm về việc sử dụng ứng dụng của thành viên dưới 18 tuổi.",
+        "source": "9_quy_chế_sử_dụng_tài_khoản_gia_đình.md, Khoản 3 & 4"
+    },
+    {
+        "id": "TC_009",
+        "category": "Dữ liệu cá nhân",
+        "question": "Xanh SM có quyền chia sẻ dữ liệu cá nhân của tôi cho bên thứ ba không?",
+        "expected_answer": "Xanh SM tuyệt đối không tiết lộ dữ liệu cá nhân cho bên thứ ba trừ khi việc tiết lộ đó là bắt buộc để xử lý yêu cầu của chính Người dùng và khi đó Người dùng phải đồng ý với quy định bảo mật của bên thứ ba đó.",
+        "source": "1_điều_khoản_sử_dụng.md, Mục 15.3"
+    },
+    {
+        "id": "TC_010",
+        "category": "Thanh toán Xanh Ngon",
+        "question": "Tài xế đi giao đồ ăn Xanh Ngon có phải trả tiền trước cho quán ăn không?",
+        "expected_answer": "Có, Đối tác vận chuyển xác nhận lệnh đã lấy hàng trên Ứng dụng và ứng tiền cho Đối tác Thương nhân (nếu có).",
+        "source": "10_quy_chế_sử_dụng_sản_phẩm_xanh_ngon.md, Mục 3, Bước 3"
+    },
+    {
+        "id": "TC_011",
+        "category": "Đổi trả hàng Xanh Ngon",
+        "question": "Tôi nhận món từ Xanh Ngon nhưng thấy không đúng như mô tả, tôi có thể yêu cầu Xanh SM đổi trả hàng ngay lập tức không?",
+        "expected_answer": "Không. Xanh SM không phải nhà cung cấp hàng hóa. Việc đổi trả hàng hóa sẽ được thực hiện theo chính sách của Đối tác Thương nhân (nhà hàng). Xanh SM chỉ hỗ trợ trong khả năng nhưng không có nghĩa vụ thực hiện việc đổi trả.",
+        "source": "10_quy_chế_sử_dụng_sản_phẩm_xanh_ngon.md, Mục 6.2"
+    },
+    {
+        "id": "TC_012",
+        "category": "Thời gian giao kết hợp đồng",
+        "question": "Hợp đồng vận chuyển giữa khách và tài xế Xanh Bike được coi là giao kết vào thời điểm nào?",
+        "expected_answer": "Trong thời gian 30 giây sau khi Đối tác xác nhận lệnh đặt của Người dùng mà không có bên nào hủy lệnh, thỏa thuận pháp lý được coi là đã giao kết.",
+        "source": "5_quy_trình_dành_cho_người_dùng.md, Bước 4"
+    },
+    {
+        "id": "TC_013",
+        "category": "Xanh Express - Kiểm tra hàng",
+        "question": "Tài xế Xanh Express có quyền mở gói hàng của tôi ra xem bên trong có gì không?",
+        "expected_answer": "Có. Đối tác và Xanh SM có quyền kiểm tra hàng hóa nếu nghi ngờ hàng hóa đó thuộc danh mục cấm lưu thông hoặc không được phép vận chuyển theo quy định pháp luật.",
+        "source": "7_quy_chế_sử_dụng_sản_phẩm_xanh_express.md, Mục 3.2.4"
+    },
+    {
+        "id": "TC_014",
+        "category": "Thông tin tài khoản",
+        "question": "Khi tham gia Tài khoản Gia đình, các thành viên có thấy được thông tin của nhau không?",
+        "expected_answer": "Có. Tất cả Thành viên trong Tài khoản Gia Đình sẽ có thể xem hồ sơ của nhau.",
+        "source": "9_quy_chế_sử_dụng_tài_khoản_gia_đình.md, Khoản 5"
+    },
+    {
+        "id": "TC_015",
+        "category": "Miễn trừ trách nhiệm",
+        "question": "Nếu hệ thống Xanh SM bị lỗi kỹ thuật khiến tôi không đặt được xe và lỡ chuyến bay, Xanh SM có bồi thường không?",
+        "expected_answer": "Xanh SM không chịu trách nhiệm trước những thiệt hại, tổn thất của Người dùng phát sinh trong quá trình giao dịch, trừ phi thiệt hại đó là do lỗi cố ý của Xanh SM.",
+        "source": "4_miễn_trừ_trách_nhiệm.md"
+    },
+    {
+        "id": "TC_016",
+        "category": "Xanh Express - Danh mục hàng cấm",
+        "question": "Tôi có thể dùng dịch vụ Xanh Express để gửi một chú mèo con hoặc chim cảnh đi giao cho khách được không?",
+        "expected_answer": "Không. Theo quy định về các mặt hàng không được phép gửi, Xanh Express tuyệt đối không nhận vận chuyển 'Động vật sống' (bao gồm cả thú cưng). Việc gửi động vật sống là vi phạm cam kết về danh mục hàng hóa của dịch vụ.",
+        "source": "7_quy_chế_sử_dụng_sản_phẩm_xanh_express.md, Mục 3.1.2 (j)"
+    },
+    {
+        "id": "TC_017",
+        "category": "Xanh Express - Khối lượng",
+        "question": "Khi đặt Xanh Express, tôi có bắt buộc phải nhập khối lượng hàng hóa không?",
+        "expected_answer": "Có. Người dùng cần nhập đầy đủ thông tin bao gồm: Nơi lấy/nhận, thông tin người gửi/nhận, loại dịch vụ và khối lượng.",
+        "source": "5_quy_trình_dành_cho_người_dùng.md, Bước 3"
+    },
+    {
+        "id": "TC_018",
+        "category": "Dữ liệu cá nhân - Sửa đổi",
+        "question": "Tôi có quyền yêu cầu Xanh SM chỉnh sửa thông tin cá nhân của mình bị sai lệch không?",
+        "expected_answer": "Có. Xử lý dữ liệu cá nhân bao gồm các hoạt động như chỉnh sửa, lưu trữ, truy cập theo quy định.",
+        "source": "3_chính_sách_bảo_vệ_dữ_liệu_cá_nhân.md, Mục 1.3"
+    },
+    {
+        "id": "TC_019",
+        "category": "Tổng đài hỗ trợ",
+        "question": "Số điện thoại tổng đài hỗ trợ chính thức của Xanh SM được ghi trong quy chế là số nào?",
+        "expected_answer": "Số tổng đài hỗ trợ là 02471096839.",
+        "source": "6_quy_chế_sử_dụng_sản_phẩm_xanh_bike.md, Mục 2, Bước 5"
+    },
+    {
+        "id": "TC_020",
+        "category": "Xanh Express - Bảo hiểm & Định nghĩa",
+        "question": "Sổ tiết kiệm hoặc tiền mặt có được coi là 'Tài liệu' để áp dụng mức bảo hiểm tài liệu không?",
+        "expected_answer": "Không. Theo quy định, 'Tài liệu' bao gồm các loại hàng hóa mang tin như văn bản, chứng thư, hồ sơ, thư từ... nhưng không bao gồm trái phiếu vô danh, phiếu mua hàng, phiếu thưởng, ngân phiếu, tiền mặt hoặc những chứng từ có thể chuyển nhượng khác.",
+        "source": "7_quy_chế_sử_dụng_sản_phẩm_xanh_express.md, Mục 4.3.2 (iv)"
+    },
+    {
+        "id": "TC_021",
+        "category": "Xanh Express - Danh mục hàng cấm",
+        "question": "Tôi muốn gửi một bình gas loại 12kg qua Xanh Express có được không?",
+        "expected_answer": "Không. Bình gas thuộc danh mục hàng hóa nguy hiểm và chất dễ cháy nổ, là những mặt hàng mà Người dùng không được phép gửi qua dịch vụ Xanh Express. Ngoài ra, tài xế có quyền từ chối nếu hàng hóa quá khổ và không đảm bảo an toàn vận chuyển.",
+        "source": "7_quy_chế_sử_dụng_sản_phẩm_xanh_express.md, Mục 3.1.2 (c), (h) và Mục 3.2.4"
+    },
+    {
+        "id": "TC_022",
+        "category": "Quy định hành lý - Xanh Car",
+        "question": "Chúng tôi đi 4 người và có 4 vali cỡ lớn. Nếu tài xế Xanh Car thấy không vừa cốp và từ chối chở thì có đúng quy định không?",
+        "expected_answer": "Đúng. Đối tác (Tài xế) có quyền từ chối cung cấp dịch vụ nếu Người dùng mang theo đồ vật quá khổ mà Đối tác đánh giá là có khả năng vi phạm quy định pháp luật về giao thông đối với xe chở khách hoặc không đảm bảo nguyên tắc an toàn.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 3.3"
+    },
+    {
+        "id": "TC_023",
+        "category": "Quy định hành lý - Bồi thường",
+        "question": "Hành lý của tôi là thùng hải sản bị rò rỉ nước ra sàn xe Xanh Car gây mùi hôi thối. Tôi có phải bồi thường cho tài xế không?",
+        "expected_answer": "Có. Người dùng/Khách hàng phải chịu hoàn toàn trách nhiệm và bồi thường mọi thiệt hại phát sinh mà Xanh SM và/hoặc Đối tác phải chịu liên quan tới hành lý/tài sản mang theo.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 3.4"
+    },
+    {
+        "id": "TC_024",
+        "category": "Quy định hành lý - Kiểm tra",
+        "question": "Tài xế nghi ngờ tôi mang pháo hoa trong túi xách và yêu cầu mở ra kiểm tra. Tôi có bắt buộc phải cho tài xế xem không?",
+        "expected_answer": "Có. Xanh SM và/hoặc Đối tác có quyền kiểm tra hành lý mang theo của Người dùng/Khách hàng nếu nghi ngờ hành lý đó thuộc danh mục cấm lưu thông hoặc không được phép vận chuyển.",
+        "source": "6_quy_chế_sử_dụng_sản_phẩm_xanh_bike.md, Mục 3.4"
+    },
+    {
+        "id": "TC_025",
+        "category": "Quy định hành lý - Trách nhiệm",
+        "question": "Nếu tôi để đồ dễ vỡ trong vali và tài xế Xanh Bike đi vào ổ gà làm đồ bên trong bị hỏng, tài xế có phải đền cho tôi không?",
+        "expected_answer": "Không. Trong mọi trường hợp, Người dùng/Khách hàng vẫn phải chịu trách nhiệm hoàn toàn đối với hành lý mang theo. Việc tài xế có quyền kiểm tra hành lý không đồng nghĩa với việc tài xế phải chịu trách nhiệm đối với hành lý đó.",
+        "source": "6_quy_chế_sử_dụng_sản_phẩm_xanh_bike.md, Mục 3.4"
+    },
+    {
+        "id": "TC_026",
+        "category": "Quy định hành lý - Xanh Car",
+        "question": "Tôi có thể yêu cầu tài xế Xanh Car gập ghế sau để chở một chiếc xe đạp thể thao bên trong xe không?",
+        "expected_answer": "Tài xế có quyền từ chối nếu đánh giá việc này là mang theo đồ vật quá khổ, có khả năng vi phạm quy định pháp luật về giao thông đối với xe chở khách hoặc không đảm bảo nguyên tắc an toàn cho phương tiện.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 3.3"
+    },
+    {
+        "id": "TC_027",
+        "category": "Quy định hành lý - Pháp luật",
+        "question": "Nếu tôi vô tình mang theo hàng cấm mà không biết, khi bị công an kiểm tra thì ai sẽ chịu trách nhiệm?",
+        "expected_answer": "Người dùng/Khách hàng chịu hoàn toàn trách nhiệm trước pháp luật và phải bồi thường mọi thiệt hại phát sinh cho Xanh SM và Đối tác nếu hành lý mang theo vi phạm quy định.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 3.4"
+    },
+    {
+        "id": "TC_028",
+        "category": "Quy định hành lý - An toàn",
+        "question": "Tài xế Xanh Bike có trách nhiệm gì trong việc đảm bảo hành lý của khách không bị rơi rớt dọc đường?",
+        "expected_answer": "Đối tác (Tài xế) là người điều khiển phương tiện chịu trách nhiệm trước pháp luật về việc bảo đảm an toàn cho phương tiện. Tuy nhiên, về phía hành lý, Người dùng vẫn là bên chịu trách nhiệm hoàn toàn đối với tài sản mình mang theo.",
+        "source": "6_quy_chế_sử_dụng_sản_phẩm_xanh_bike.md, Mục 3.3 và 3.4"
+    },
+    {
+        "id": "TC_029",
+        "category": "Quy định hành lý - Từ chối phục vụ",
+        "question": "Tôi mang theo một cây cảnh cao 1m50, tài xế Xanh Bike từ chối chở vì sợ vướng gương chiếu hậu. Điều này có đúng quy định của Xanh SM không?",
+        "expected_answer": "Đúng. Đối tác có quyền từ chối nếu đồ vật quá khổ làm ảnh hưởng đến việc tuân thủ quy tắc giao thông và không đảm bảo nguyên tắc an toàn cho mình và người khác.",
+        "source": "6_quy_chế_sử_dụng_sản_phẩm_xanh_bike.md, Mục 3.2 và 3.3"
+    },
+    {
+        "id": "TC_030",
+        "category": "Quy định hành lý - Xanh Car",
+        "question": "Tôi mang theo vàng và trang sức kim cương trong hành lý khi đi Xanh Car. Nếu xảy ra mất mát, Xanh SM có trách nhiệm bồi thường không?",
+        "expected_answer": "Không. Trong mọi trường hợp, Người dùng/Khách hàng phải chịu trách nhiệm hoàn toàn đối với hành lý mang theo. Xanh SM không chịu trách nhiệm đối với hành lý của Người dùng.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 3.4"
+    },
+    {
+        "id": "TC_031",
+        "category": "Quy định chung - Cập nhật điều khoản",
+        "question": "Xanh SM có cần phải gọi điện thông báo cho tôi mỗi khi họ thay đổi điều khoản sử dụng không?",
+        "expected_answer": "Không nhất thiết. Xanh SM có thể điều chỉnh điều khoản bất kỳ lúc nào và sẽ thông báo qua Ứng dụng và/hoặc email đăng ký. Phiên bản cập nhật sẽ được công bố tại website xanhsm.com hoặc trên Ứng dụng. Người dùng có trách nhiệm thường xuyên kiểm tra các thay đổi này.",
+        "source": "1_điều_khoản_sử_dụng.md, Mục Quy định chung (đoạn về điều chỉnh Hợp đồng)"
+    },
+    {
+        "id": "TC_032",
+        "category": "Xanh Car - Trách nhiệm Đối tác",
+        "question": "Tài xế Xanh Car có được phép yêu cầu tôi thanh toán thêm tiền ngoài giá hiển thị trên app nếu quãng đường bị tắc đường lâu không?",
+        "expected_answer": "Không. Đối tác phải tuân thủ quy định pháp luật, Điều khoản và Chính sách Xanh SM. Giá cước và phương thức thanh toán phải theo đúng thông tin hiển thị trên Ứng dụng mà Người dùng đã lựa chọn.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 4.2 và 5_quy_trình_dành_cho_người_dùng.md, Bước 5"
+    },
+    {
+        "id": "TC_033",
+        "category": "Dữ liệu cá nhân - Cookie",
+        "question": "Tôi thấy quảng cáo về Xanh SM xuất hiện trên trình duyệt của máy tính dùng chung ở công ty. Có phải Xanh SM đã bán số điện thoại của tôi cho bên quảng cáo không?",
+        "expected_answer": "Không. XanhSM.com không cung cấp bất kỳ thông tin cá nhân nào của Người dùng cho các nhà quảng cáo hoặc bên thứ ba. Việc hiển thị quảng cáo tương thích có thể do Cookies lưu trữ hành trình tìm kiếm trên trình duyệt của thiết bị dùng chung.",
+        "source": "2_chính_sách_sử_dụng_cookies.md, Mục 5. Cookies tiếp thị và quảng cáo"
+    },
+    {
+        "id": "TC_034",
+        "category": "Quy trình người dùng - Thời gian giao kết",
+        "question": "Tôi vừa đặt xe Xanh Car được 10 giây thì muốn hủy vì đổi ý. Tôi có bị coi là vi phạm hợp đồng vận chuyển không?",
+        "expected_answer": "Không. Thỏa thuận pháp lý (Hợp đồng vận chuyển) chỉ được coi là giao kết sau 30 giây kể từ khi Đối tác xác nhận lệnh đặt mà không có bên nào hủy lệnh.",
+        "source": "5_quy_trình_dành_cho_người_dùng.md, Bước 4"
+    },
+    {
+        "id": "TC_035",
+        "category": "Xanh Car - Quyền từ chối",
+        "question": "Tôi đặt xe cho 5 người lớn nhưng lại đặt loại xe Xanh Car 5 chỗ (bao gồm tài xế). Tài xế có quyền từ chối chở không?",
+        "expected_answer": "Có. Đối tác có quyền từ chối cung cấp Sản Phẩm nếu việc vận chuyển có khả năng vi phạm quy định pháp luật về giao thông đối với xe chở khách (chở quá số người quy định) hoặc không đảm bảo nguyên tắc an toàn.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 3.3"
+    },
+    {
+        "id": "TC_036",
+        "category": "Dữ liệu cá nhân - Quyền chủ thể",
+        "question": "Tôi muốn biết Xanh SM đang lưu trữ những thông tin gì của tôi, tôi có quyền yêu cầu họ cung cấp danh sách đó không?",
+        "expected_answer": "Có. Với tư cách là Chủ Thể Dữ Liệu Cá Nhân, bạn có các quyền như: được biết về hoạt động xử lý dữ liệu, quyền truy cập để xem, chỉnh sửa hoặc yêu cầu cung cấp dữ liệu cá nhân của mình.",
+        "source": "3_chính_sách_bảo_vệ_dữ_liệu_cá_nhân.md, Mục 1.3 và Mục 11"
+    },
+    {
+        "id": "TC_037",
+        "category": "Miễn trừ trách nhiệm - Liên kết bên thứ ba",
+        "question": "Tôi bấm vào một link quảng cáo trên app Xanh SM dẫn sang một trang web mua sắm khác và bị lừa tiền. Xanh SM có đền bù cho tôi không?",
+        "expected_answer": "Không. Xanh SM cung cấp các liên kết tới trang web của bên thứ ba chỉ nhằm tạo sự thuận tiện và không chịu trách nhiệm pháp lý cho bất kỳ thiệt hại nào phát sinh từ nội dung hoặc giao dịch trên các trang web đó.",
+        "source": "4_miễn_trừ_trách_nhiệm.md"
+    },
+    {
+        "id": "TC_038",
+        "category": "Xanh Car - Thái độ phục vụ",
+        "question": "Nếu tài xế Xanh Car có thái độ khiếm nhã hoặc không tuân thủ quy tắc giao thông, tôi phải làm gì?",
+        "expected_answer": "Sau khi kết thúc chuyến xe, bạn có thể thực hiện đánh giá, gửi thắc mắc, khiếu nại hoặc phản ánh chất lượng dịch vụ thông qua Ứng dụng hoặc gọi đến tổng đài hỗ trợ 02471096839.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 2, Bước 5"
+    },
+    {
+        "id": "TC_039",
+        "category": "Quy trình người dùng - Mã khuyến mại",
+        "question": "Tôi quên nhập mã khuyến mại trước khi đặt xe, giờ xe đang chạy tôi có thể yêu cầu tài xế áp dụng mã đó để giảm tiền mặt không?",
+        "expected_answer": "Không. Người dùng phải lựa chọn mã khuyến mại (nếu có) ở bước đặt lệnh trên ứng dụng để nhận được mức giá xác định trước khi giao kết hợp đồng.",
+        "source": "5_quy_trình_dành_cho_người_dùng.md, Bước 4"
+    },
+    {
+        "id": "TC_040",
+        "category": "Xanh Car - An toàn phương tiện",
+        "question": "Trong lúc chờ đèn đỏ, một xe khác đâm vào đuôi xe Xanh Car làm tôi bị đau cổ. Ai là người chịu trách nhiệm bồi thường trực tiếp cho tôi theo quy chế?",
+        "expected_answer": "Đối tác (Tài xế) là người điều khiển phương tiện phải giữ gìn an toàn cho khách trên xe tuy nhiên không có quy định chịu trách nhiệm bồi thường cho khách trên xe khi xảy ra tai nạn do bên thứ 3 gây ra.",
+        "source": "8_quy_chế_sử_dụng_sản_phẩm_xanh_car.md, Mục 3.2"
+    }
+]
