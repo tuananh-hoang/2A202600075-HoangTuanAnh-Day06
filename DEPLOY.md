@@ -4,8 +4,8 @@
 
 **Platform**: Railway  
 **Repository**: https://github.com/tuananh-hoang/2A202600075-HoangTuanAnh-Day06  
-**Public URL**: `https://[your-app].up.railway.app` (Generate trong Railway dashboard sau khi deploy thành công)  
-**Deploy Status**: ✅ Code pushed, Railway đang build...
+**Public URL**: https://2a202600075-hoangtuananh-day06-production.up.railway.app  
+**Deploy Status**: ✅ Deployment successful!
 
 ---
 

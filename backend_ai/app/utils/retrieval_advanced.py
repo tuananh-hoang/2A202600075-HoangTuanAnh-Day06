@@ -123,7 +123,12 @@ class HybridRAGRetriever(BaseRetriever):
         super().__init__(**kwargs)
 
         # OpenAI client — dùng key từ config (OPENAI_API_KEY env var)
-        self._client = OpenAI()
+        # Nếu không có key, set None (sẽ dùng mock LLM)
+        from app.core.config import settings
+        if settings.openai_api_key:
+            self._client = OpenAI(api_key=settings.openai_api_key)
+        else:
+            self._client = None  # Mock LLM mode
 
         # Load FAISS index
         self._faiss_index = faiss.read_index(self.faiss_path)

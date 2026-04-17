@@ -180,18 +180,20 @@ LOG_FORMAT=json
 Railway dashboard → Backend service → Settings → Networking → "Generate Domain"
 
 #### Bước 5: Verify Deployment
+2a202600075-hoangtuananh-day06-production.up.railway.app
+
 
 ```bash
 # Health check
-curl https://[your-app].up.railway.app/health
+curl https://2a202600075-hoangtuananh-day06-production.up.railway.app/health
 
 # Readiness check
-curl https://[your-app].up.railway.app/ready
+curl https://2a202600075-hoangtuananh-day06-production.up.railway.app/ready
 
 # Test chat
-curl https://[your-app].up.railway.app/chat -X POST \
+curl https://2a202600075-hoangtuananh-day06-production.up.railway.app/chat -X POST \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: YOUR-API-KEY" \
+  -H "X-API-Key: xanhsm-dev-key-2026-dj4334**32" \
   -d '{"message":"test"}'
 ```
 
