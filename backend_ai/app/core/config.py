@@ -98,6 +98,8 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        case_sensitive = False  # Allow AGENT_API_KEY to map to agent_api_key
+        env_file_encoding = "utf-8"
         case_sensitive = False
         
     def validate_production(self) -> None:
