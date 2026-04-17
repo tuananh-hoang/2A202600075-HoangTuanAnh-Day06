@@ -38,7 +38,7 @@ COPY --from=builder /root/.local /home/appuser/.local
 COPY backend_ai/app/ /app/app/
 
 # Copy knowledge base
-COPY NhomA1-C401-Day06/data_pipeline/db_setup /app/data_pipeline/db_setup
+COPY data_pipeline/db_setup /app/data_pipeline/db_setup
 
 RUN mkdir -p /app/data_pipeline/db_setup && \
     chown -R appuser:appuser /app
