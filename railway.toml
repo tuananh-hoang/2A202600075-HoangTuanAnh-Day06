@@ -1,8 +1,7 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "backend_ai/Dockerfile"
-dockerContext = "backend_ai"
-watchPatterns = ["backend_ai/**"]
+dockerfilePath = "backend_ai/Dockerfile.railway"
+watchPatterns = ["backend_ai/**", "NhomA1-C401-Day06/data_pipeline/**"]
 
 [deploy]
 startCommand = "uvicorn app.main_v3:app --host 0.0.0.0 --port $PORT"
