@@ -1,0 +1,84 @@
+# ============================================================
+# .dockerignore — Exclude files from Docker build context
+# Giảm build time và image size
+# ============================================================
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Documentation
+*.md
+docs/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Environment files (secrets should not be in image)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
+*_test.py
+tests/
+
+# Data files (should be mounted as volumes)
+*.sqlite
+*.faiss
+*.db
+data/
+raw_data/
+processed_data/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Docker files (don't need in image)
+Dockerfile*
+docker-compose*.yml
+.dockerignore

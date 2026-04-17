@@ -2,15 +2,50 @@ version: '3.8'
 
 services:
   backend:
-    build: ./backend_ai
+    build:
+      context: ./backend_ai
+      dockerfile: Dockerfile
+    image: xanhsm-agent:latest
+    container_name: xanhsm-backend
     volumes:
-      - ./backend_ai:/app
+      # Mount knowledge base (read-only in production)
+      - ./data_pipeline/db_setup:/app/data_pipeline/db_setup:ro
     env_file:
       - .env
+    environment:
+      - ENVIRONMENT=staging
+      - PORT=8000
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_ENABLED=true
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
     depends_on:
-      - qdrant
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+
+  redis:
+    image: redis:7-alpine
+    container_name: xanhsm-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
@@ -30,3 +65,6 @@ services:
       - "6334:6334"
     volumes:
       - ./qdrant_data:/qdrant/storage
+
+volumes:
+  redis_data:

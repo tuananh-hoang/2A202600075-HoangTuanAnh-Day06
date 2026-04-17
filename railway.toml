@@ -1,0 +1,11 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "backend_ai/Dockerfile"
+watchPatterns = ["backend_ai/**"]
+
+[deploy]
+startCommand = "uvicorn app.main_v3:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

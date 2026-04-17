@@ -1,0 +1,58 @@
+# Railway ignore file
+# Exclude files không cần deploy
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Tests
+tests/
+test_*.py
+*_test.py
+
+# Local data
+qdrant_data/
+*.sqlite
+*.faiss
+
+# Logs
+*.log
+
+# Environment (Railway provides these)
+.env
+.env.local
+
+# Docker (Railway builds from Dockerfile)
+docker-compose.yml
+Dockerfile.dev
+
+# Frontend (deploy separately if needed)
+frontend/
+
+# Scripts
+scripts/
