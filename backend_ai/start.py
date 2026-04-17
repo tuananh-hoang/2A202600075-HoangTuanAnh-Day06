@@ -2,6 +2,7 @@
 import os
 import sys
 
+print(f"[DEBUG] OPENAI_API_KEY from os.environ = '{os.environ.get('OPENAI_API_KEY', 'NOT_FOUND')}'")
 def main():
     # DEBUG: In ra để xem Railway có inject đúng không
     print("=== ENV CHECK ===")
