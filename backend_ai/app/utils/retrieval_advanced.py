@@ -1,10 +1,15 @@
 """
 retrieval_advanced.py
-Nâng cấp RAG: Hybrid Search (BM25 + FAISS) + RRF + Cross-Encoder Reranker
-Tương thích hoàn toàn với schema SQLite/FAISS từ setup_db.py của team Data.
+Hybrid Search (BM25 + FAISS) + RRF
+Dùng OpenAI Embeddings thay sentence_transformers → loại bỏ PyTorch khỏi image.
+
+⚠️  LƯU Ý QUAN TRỌNG khi migrate:
+    - Model cũ (all-MiniLM-L6-v2) → vector 384 chiều
+    - Model mới (text-embedding-3-small) → vector 1536 chiều
+    - Bắt buộc rebuild FAISS index bằng setup_db.py trước khi deploy.
 
 Đặt file này tại: backend_ai/app/retrieval_advanced.py
-Sau đó sửa tools.py: thay CustomFAISSSQLiteRetriever → HybridRAGRetriever
+Sau đó sửa tools.py: from app.retrieval_advanced import get_xanh_sm_retriever
 """
 
 from __future__ import annotations
@@ -20,9 +25,9 @@ from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.tools import create_retriever_tool
+from openai import OpenAI
 from pydantic import Field, PrivateAttr
 from rank_bm25 import BM25Okapi
-from sentence_transformers import CrossEncoder, SentenceTransformer
 
 from app.core import config
 
@@ -40,7 +45,14 @@ class _Candidate:
     """
     __slots__ = ("chunk_id", "section_title", "content", "url", "score")
 
-    def __init__(self, chunk_id: int, section_title: str, content: str, url: str = "", score: float = 0.0):
+    def __init__(
+        self,
+        chunk_id: int,
+        section_title: str,
+        content: str,
+        url: str = "",
+        score: float = 0.0,
+    ):
         self.chunk_id = chunk_id
         self.section_title = section_title
         self.content = content
@@ -78,59 +90,45 @@ def _rrf_merge(
 
 class HybridRAGRetriever(BaseRetriever):
     """
-    Drop-in replacement cho CustomFAISSSQLiteRetriever.
-    Giao diện giữ nguyên (BaseRetriever → list[Document]),
-    bên trong thêm 3 lớp nâng cấp:
+    Hybrid RAG dùng OpenAI Embeddings (dense) + BM25 (sparse) + RRF.
+    Không còn phụ thuộc sentence_transformers hay PyTorch.
 
-      FAISS (dense)  ─┐
-      BM25  (sparse) ─┤→ RRF → CrossEncoder Reranker → top final_k
+    Pipeline:
+        FAISS (OpenAI dense)  ─┐
+        BM25  (sparse)        ─┤→ RRF → top final_k Documents
     """
 
-    # ── Pydantic fields (khai báo public, Pydantic sẽ validate) ──
+    # ── Pydantic fields ──
     sqlite_path: str = Field(default=config.SQLITE_PATH)
     faiss_path: str = Field(default=config.FAISS_PATH)
-    model_name: str = Field(default=config.EMBEDDING_MODEL)
 
-    # Số candidates mỗi retriever trước khi merge — đặt lớn hơn final_k
+    # OpenAI embedding model — text-embedding-3-small: nhanh, rẻ, 1536 chiều
+    # text-embedding-3-large: chính xác hơn, 3072 chiều, đắt hơn ~3x
+    embedding_model: str = Field(default="text-embedding-3-small")
+
+    # Số candidates mỗi retriever trước khi merge
     candidate_k: int = Field(default=20)
-    # Số chunks thực sự trả về sau rerank
+    # Số chunks thực sự trả về sau RRF
     final_k: int = Field(default=5)
 
-    reranker_model: str = Field(
-        default="cross-encoder/ms-marco-MiniLM-L-6-v2",
-        description=(
-            "Model cross-encoder. Với corpus tiếng Việt nặng, "
-            "cân nhắc: cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
-        ),
-    )
-
-    # ── Private attributes — Pydantic không serialize ──
+    # ── Private attributes ──
+    _client: OpenAI = PrivateAttr()
     _faiss_index: faiss.Index = PrivateAttr()
-    _embed_model: SentenceTransformer = PrivateAttr()
-    _reranker: CrossEncoder = PrivateAttr()
     _bm25: BM25Okapi = PrivateAttr()
-
-    # Map: vị trí trong BM25 corpus (0-indexed) → chunk_id trong SQLite
     _bm25_idx_to_chunk_id: list[int] = PrivateAttr(default_factory=list)
-    # Map: faiss_row_id → chunk_id (load 1 lần lúc khởi tạo)
     _faiss_row_to_chunk_id: dict[int, int] = PrivateAttr(default_factory=dict)
-    # Cache nội dung chunk: chunk_id → _Candidate (tránh query SQLite lặp)
     _chunk_cache: dict[int, _Candidate] = PrivateAttr(default_factory=dict)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # Bước 1: load FAISS index từ disk
+        # OpenAI client — dùng key từ config (OPENAI_API_KEY env var)
+        self._client = OpenAI(api_key=config.OPENAI_API_KEY)
+
+        # Load FAISS index
         self._faiss_index = faiss.read_index(self.faiss_path)
 
-        # Bước 2: load embedding model
-        self._embed_model = SentenceTransformer(self.model_name)
-
-        # Bước 3: load cross-encoder reranker
-        logger.info("Loading reranker: %s", self.reranker_model)
-        self._reranker = CrossEncoder(self.reranker_model)
-
-        # Bước 4: load toàn bộ corpus từ SQLite, build BM25 + cache + faiss map
+        # Load SQLite corpus → build BM25 + caches
         self._load_from_sqlite()
 
     # ──────────────────────────────────────────────
@@ -139,29 +137,24 @@ class HybridRAGRetriever(BaseRetriever):
 
     def _load_from_sqlite(self) -> None:
         """
-        Load 1 lần duy nhất khi service khởi động.
-        SQLite corpus nhỏ (policy docs) nên giữ toàn bộ trong RAM là hợp lý.
-        Nếu corpus > vài trăm MB thì cần streaming BM25 hoặc Elasticsearch.
+        Load 1 lần khi service khởi động.
+        Build BM25 index và cache toàn bộ chunk content trong RAM.
         """
         conn = sqlite3.connect(self.sqlite_path)
         try:
-            # Load faiss_index_map: faiss_row_id → chunk_id
             rows = conn.execute(
                 "SELECT faiss_row_id, chunk_id FROM faiss_index_map ORDER BY faiss_row_id"
             ).fetchall()
             self._faiss_row_to_chunk_id = {int(r[0]): int(r[1]) for r in rows}
 
-            # Load tất cả chunks để build BM25 và cache nội dung
-            # JOIN với documents để lấy source_path (URL)
             chunk_rows = conn.execute(
                 """
-                SELECT c.id, c.section_title, c.content, d.source_path 
+                SELECT c.id, c.section_title, c.content, d.source_path
                 FROM chunks c
                 JOIN documents d ON c.document_id = d.id
                 ORDER BY c.id
                 """
             ).fetchall()
-
         finally:
             conn.close()
 
@@ -173,7 +166,6 @@ class HybridRAGRetriever(BaseRetriever):
             section_title = section_title or ""
             content = content or ""
 
-            # Cache candidate
             self._chunk_cache[chunk_id] = _Candidate(
                 chunk_id=chunk_id,
                 section_title=section_title,
@@ -181,8 +173,6 @@ class HybridRAGRetriever(BaseRetriever):
                 url=url or "",
             )
 
-            # BM25: tokenize đơn giản bằng whitespace
-            # Cho tiếng Việt: thay bằng underthesea.word_tokenize nếu cần độ chính xác cao hơn
             bm25_text = f"{section_title} {content}".lower()
             tokenized_corpus.append(bm25_text.split())
             self._bm25_idx_to_chunk_id.append(chunk_id)
@@ -195,28 +185,33 @@ class HybridRAGRetriever(BaseRetriever):
         )
 
     # ──────────────────────────────────────────────
-    # DENSE SEARCH (FAISS)
+    # DENSE SEARCH (FAISS + OpenAI Embeddings)
     # ──────────────────────────────────────────────
 
+    def _embed_query(self, query: str) -> np.ndarray:
+        """
+        Gọi OpenAI Embeddings API để encode query.
+        Trả về vector float32 đã normalize (chuẩn bị cho cosine search).
+        """
+        response = self._client.embeddings.create(
+            input=query,
+            model=self.embedding_model,
+        )
+        vec = np.array(response.data[0].embedding, dtype=np.float32)
+        # Normalize để dùng với IndexFlatIP (inner product = cosine khi normalized)
+        norm = np.linalg.norm(vec)
+        if norm > 0:
+            vec /= norm
+        return vec
+
     def _dense_search(self, query: str) -> list[tuple[int, float]]:
-        """
-        Trả về list (chunk_id, cosine_score), sắp xếp giảm dần.
-
-        Encode query KHÔNG thêm prefix "passage:" vì đây là query, không phải document.
-        Model paraphrase-multilingual-MiniLM không dùng asymmetric prefix,
-        khác với e5/bge cần "query: " / "passage: ".
-        """
-        q_vec = self._embed_model.encode(
-            [query],
-            convert_to_numpy=True,
-            normalize_embeddings=True,
-        ).astype(np.float32)
-
+        """Trả về list (chunk_id, cosine_score), sắp xếp giảm dần."""
+        q_vec = self._embed_query(query).reshape(1, -1)
         scores, faiss_row_ids = self._faiss_index.search(q_vec, self.candidate_k)
 
         results: list[tuple[int, float]] = []
         for row_id, score in zip(faiss_row_ids[0].tolist(), scores[0].tolist()):
-            if row_id == -1:            # FAISS trả -1 nếu index có ít hơn k entries
+            if row_id == -1:
                 continue
             chunk_id = self._faiss_row_to_chunk_id.get(int(row_id))
             if chunk_id is not None:
@@ -228,35 +223,15 @@ class HybridRAGRetriever(BaseRetriever):
     # ──────────────────────────────────────────────
 
     def _sparse_search(self, query: str) -> list[tuple[int, float]]:
-        """
-        Trả về list (chunk_id, bm25_score), sắp xếp giảm dần.
-        BM25 tốt với từ khóa chính xác: tên quy định, mức giá, điều khoản cụ thể.
-        """
+        """Trả về list (chunk_id, bm25_score), sắp xếp giảm dần."""
         tokens = query.lower().split()
         raw_scores = self._bm25.get_scores(tokens)
         top_indices = np.argsort(raw_scores)[::-1][: self.candidate_k]
         return [
             (self._bm25_idx_to_chunk_id[int(i)], float(raw_scores[i]))
             for i in top_indices
-            if raw_scores[i] > 0          # lọc chunk có score = 0 (không liên quan)
+            if raw_scores[i] > 0
         ]
-
-    # ──────────────────────────────────────────────
-    # RERANKER
-    # ──────────────────────────────────────────────
-
-    def _rerank(self, query: str, candidates: list[_Candidate]) -> list[_Candidate]:
-        """
-        CrossEncoder chấm điểm từng cặp (query, content).
-        Chỉ chạy trên candidate_k chunks đã qua RRF — không scan toàn corpus.
-        """
-        if not candidates:
-            return []
-        pairs = [(query, c.content) for c in candidates]
-        scores: np.ndarray = self._reranker.predict(pairs)
-        for cand, score in zip(candidates, scores.tolist()):
-            cand.score = float(score)
-        return sorted(candidates, key=lambda c: c.score, reverse=True)
 
     # ──────────────────────────────────────────────
     # ENTRY POINT — giao diện BaseRetriever
@@ -270,26 +245,19 @@ class HybridRAGRetriever(BaseRetriever):
     ) -> List[Document]:
         t0 = time.perf_counter()
 
-        # Bước 1: dense + sparse retrieval
-        dense_results  = self._dense_search(query)
+        # Bước 1: dense (OpenAI) + sparse (BM25)
+        dense_results = self._dense_search(query)
         sparse_results = self._sparse_search(query)
 
-        # Bước 2: RRF merge → list (chunk_id, rrf_score)
+        # Bước 2: RRF merge
         merged = _rrf_merge(dense_results, sparse_results)
 
-        # Bước 3: lấy _Candidate từ cache cho top merged
-        candidates: list[_Candidate] = []
-        for chunk_id, _ in merged[: self.candidate_k]:
-            cand = self._chunk_cache.get(chunk_id)
-            if cand is not None:
-                candidates.append(cand)
-
-        # Bước 4: cross-encoder rerank
-        reranked = self._rerank(query, candidates)
-
-        # Bước 5: chuyển sang LangChain Document (giữ nguyên schema cũ)
+        # Bước 3: lấy top candidates từ cache
         docs: List[Document] = []
-        for cand in reranked[: self.final_k]:
+        for chunk_id, rrf_score in merged[: self.final_k]:
+            cand = self._chunk_cache.get(chunk_id)
+            if cand is None:
+                continue
             docs.append(
                 Document(
                     page_content=cand.content,
@@ -297,7 +265,7 @@ class HybridRAGRetriever(BaseRetriever):
                         "source": cand.section_title,
                         "chunk_id": cand.chunk_id,
                         "url": cand.url,
-                        "rerank_score": round(cand.score, 4),
+                        "rrf_score": round(rrf_score, 6),
                     },
                 )
             )
@@ -316,25 +284,24 @@ class HybridRAGRetriever(BaseRetriever):
 
 
 # ──────────────────────────────────────────────────────────────────────
-# FACTORY — thay thế get_xanh_sm_retriever() trong tools.py
+# FACTORY
 # ──────────────────────────────────────────────────────────────────────
 
 def get_xanh_sm_retriever(
     candidate_k: int = 20,
     final_k: int = 5,
-    reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    embedding_model: str = "text-embedding-3-small",
 ):
     """
     Drop-in replacement cho get_xanh_sm_retriever() cũ trong tools.py.
 
     Thay đổi duy nhất cần làm trong tools.py:
         from app.retrieval_advanced import get_xanh_sm_retriever
-    (xóa import từ file tools cũ)
     """
     retriever = HybridRAGRetriever(
         candidate_k=candidate_k,
         final_k=final_k,
-        reranker_model=reranker_model,
+        embedding_model=embedding_model,
     )
     return create_retriever_tool(
         retriever,
