@@ -1,6 +1,7 @@
 """Build SQLite + FAISS stores from chunked policy data.
 
 Expected input is JSONL from ``data_pipeline/processed_data/process_data.py``.
+Dùng OpenAI Embeddings thay SentenceTransformer → không cần PyTorch trong image.
 """
 
 from __future__ import annotations
@@ -8,19 +9,21 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sqlite3
 from pathlib import Path
 from typing import Dict, Iterable, List, Sequence, Tuple
 
 import faiss
 import numpy as np
-from sentence_transformers import SentenceTransformer
-
+from openai import OpenAI
+from dotenv import load_dotenv
+load_dotenv()
 
 CHUNKS_JSONL_DEFAULT = Path(__file__).resolve().parents[1] / "processed_data" / "chunks.jsonl"
 SQLITE_PATH_DEFAULT = Path(__file__).resolve().parent / "knowledge_base.sqlite"
 FAISS_PATH_DEFAULT = Path(__file__).resolve().parent / "knowledge_base.faiss"
-MODEL_NAME_DEFAULT = "paraphrase-multilingual-MiniLM-L12-v2"
+MODEL_NAME_DEFAULT = "text-embedding-3-small"
 GENERAL_TERMS_BASE_URL = "https://www.xanhsm.com/terms-policies/general?terms="
 PRICE_NEWS_URL = "https://www.xanhsm.com/news/gia-taxi-xanh-sm-bao-nhieu"
 
@@ -125,8 +128,6 @@ def upsert_chunk(
     content: str,
     char_count: int,
 ) -> int:
-    # Include document/chunk identity so repeated policy text across files
-    # does not violate UNIQUE(content_hash).
     content_hash = hashlib.sha256(f"{document_id}:{chunk_index}:{content}".encode("utf-8")).hexdigest()
     conn.execute(
         """
@@ -168,43 +169,59 @@ def upsert_chunk(
 
 
 def build_embedding_text(section_title: str, content: str) -> str:
-    # Add section signal for better retrieval precision on policy documents.
-    return f"passage: {section_title}\n{content}".strip()
+    """
+    OpenAI embeddings không cần prefix 'passage:' như một số local model.
+    Vẫn ghép section_title để tăng ngữ cảnh cho retrieval.
+    """
+    if section_title:
+        return f"{section_title}\n{content}".strip()
+    return content.strip()
 
 
-def batched(iterable: Sequence[Tuple[int, str]], batch_size: int) -> Iterable[Sequence[Tuple[int, str]]]:
+def batched(
+    iterable: Sequence[Tuple[int, str]], batch_size: int
+) -> Iterable[Sequence[Tuple[int, str]]]:
     for idx in range(0, len(iterable), batch_size):
         yield iterable[idx : idx + batch_size]
 
 
 def insert_embeddings_and_faiss(
     conn: sqlite3.Connection,
-    model: SentenceTransformer,
+    client: OpenAI,
     chunk_texts: Sequence[Tuple[int, str]],
     model_name: str,
     faiss_path: Path,
     batch_size: int,
 ) -> None:
+    """
+    Gọi OpenAI Embeddings API theo batch, lưu vector vào SQLite và build FAISS index.
+
+    OpenAI cho phép tối đa 2048 inputs/request.
+    Mặc định batch_size=100 để tránh timeout với text dài.
+    """
     vectors: List[np.ndarray] = []
     chunk_ids: List[int] = []
+    total = len(chunk_texts)
 
-    for batch in batched(chunk_texts, batch_size=batch_size):
+    for batch_num, batch in enumerate(batched(chunk_texts, batch_size=batch_size), start=1):
         ids = [chunk_id for chunk_id, _ in batch]
         texts = [text for _, text in batch]
 
-        emb = model.encode(
-            texts,
-            batch_size=batch_size,
-            convert_to_numpy=True,
-            normalize_embeddings=True,
-            show_progress_bar=False,
-        )
-        emb = np.asarray(emb, dtype=np.float32)
+        print(f"  Embedding batch {batch_num}/{-(-total // batch_size)} ({len(texts)} chunks)...")
 
-        for row_idx, chunk_id in enumerate(ids):
-            vector = emb[row_idx]
+        response = client.embeddings.create(
+            input=texts,
+            model=model_name,
+        )
+
+        # Trả về theo thứ tự index — giữ nguyên thứ tự với ids
+        emb_data = sorted(response.data, key=lambda e: e.index)
+
+        for chunk_id, emb_obj in zip(ids, emb_data):
+            vector = np.array(emb_obj.embedding, dtype=np.float32)
             vectors.append(vector)
             chunk_ids.append(chunk_id)
+
             conn.execute(
                 """
                 INSERT INTO embeddings (chunk_id, model_name, dimension, vector)
@@ -223,12 +240,14 @@ def insert_embeddings_and_faiss(
     if not vectors:
         raise RuntimeError("No vectors were generated")
 
+    # Build FAISS index (IndexFlatIP + normalize = cosine similarity)
     matrix = np.vstack(vectors).astype(np.float32)
     faiss.normalize_L2(matrix)
     index = faiss.IndexFlatIP(matrix.shape[1])
     index.add(matrix)
     faiss.write_index(index, str(faiss_path))
 
+    # Cập nhật faiss_index_map
     conn.execute("DELETE FROM faiss_index_map")
     conn.executemany(
         "INSERT INTO faiss_index_map (faiss_row_id, chunk_id) VALUES (?, ?)",
@@ -236,14 +255,34 @@ def insert_embeddings_and_faiss(
     )
     conn.commit()
 
+    print(f"  FAISS index built: {matrix.shape[0]} vectors, dim={matrix.shape[1]}")
+
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Create SQLite + FAISS knowledge stores from chunks")
-    parser.add_argument("--chunks-file", type=Path, default=CHUNKS_JSONL_DEFAULT, help="Input chunks JSONL")
-    parser.add_argument("--sqlite-path", type=Path, default=SQLITE_PATH_DEFAULT, help="Output SQLite DB path")
-    parser.add_argument("--faiss-path", type=Path, default=FAISS_PATH_DEFAULT, help="Output FAISS index path")
-    parser.add_argument("--model-name", type=str, default=MODEL_NAME_DEFAULT, help="SentenceTransformer model")
-    parser.add_argument("--batch-size", type=int, default=32, help="Embedding batch size")
+    parser = argparse.ArgumentParser(
+        description="Create SQLite + FAISS knowledge stores from chunks (OpenAI Embeddings)"
+    )
+    parser.add_argument("--chunks-file", type=Path, default=CHUNKS_JSONL_DEFAULT)
+    parser.add_argument("--sqlite-path", type=Path, default=SQLITE_PATH_DEFAULT)
+    parser.add_argument("--faiss-path", type=Path, default=FAISS_PATH_DEFAULT)
+    parser.add_argument(
+        "--model-name",
+        type=str,
+        default=MODEL_NAME_DEFAULT,
+        help="OpenAI embedding model (text-embedding-3-small | text-embedding-3-large)",
+    )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=100,
+        help="Số chunks gửi mỗi request tới OpenAI API (max 2048)",
+    )
+    parser.add_argument(
+        "--api-key",
+        type=str,
+        default=None,
+        help="OpenAI API key (mặc định đọc từ OPENAI_API_KEY env var)",
+    )
     return parser.parse_args()
 
 
@@ -252,9 +291,20 @@ def main() -> None:
     args.sqlite_path.parent.mkdir(parents=True, exist_ok=True)
     args.faiss_path.parent.mkdir(parents=True, exist_ok=True)
 
+    api_key = args.api_key or os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "OpenAI API key not found. "
+            "Set OPENAI_API_KEY env var hoặc dùng --api-key."
+        )
+
+    client = OpenAI(api_key=api_key)
+
     raw_chunks = load_jsonl(args.chunks_file)
     if not raw_chunks:
         raise RuntimeError("No chunks found in input JSONL")
+
+    print(f"Loaded {len(raw_chunks)} chunks from {args.chunks_file}")
 
     conn = sqlite3.connect(args.sqlite_path)
     try:
@@ -264,14 +314,18 @@ def main() -> None:
         for item in raw_chunks:
             doc_id = str(item["doc_id"])
             filename = str(item["filename"])
-            source_path = resolve_source_url(filename=filename, fallback_path=str(item["source_path"]))
+            source_path = resolve_source_url(
+                filename=filename, fallback_path=str(item["source_path"])
+            )
             chunk_index = int(item["chunk_index"])
             section_title = str(item.get("section_title", ""))
             section_chunk_index = int(item.get("section_chunk_index", 0))
             content = str(item["text"])
             char_count = int(item.get("char_count", len(content)))
 
-            document_id = upsert_document(conn, doc_id=doc_id, filename=filename, source_path=source_path)
+            document_id = upsert_document(
+                conn, doc_id=doc_id, filename=filename, source_path=source_path
+            )
             chunk_id = upsert_chunk(
                 conn,
                 document_id=document_id,
@@ -281,14 +335,15 @@ def main() -> None:
                 content=content,
                 char_count=char_count,
             )
-            chunk_texts.append((chunk_id, build_embedding_text(section_title=section_title, content=content)))
+            chunk_texts.append(
+                (chunk_id, build_embedding_text(section_title=section_title, content=content))
+            )
 
         conn.commit()
 
-        model = SentenceTransformer(args.model_name)
         insert_embeddings_and_faiss(
             conn=conn,
-            model=model,
+            client=client,
             chunk_texts=chunk_texts,
             model_name=args.model_name,
             faiss_path=args.faiss_path,
@@ -297,10 +352,11 @@ def main() -> None:
     finally:
         conn.close()
 
-    print(f"Inserted/updated {len(raw_chunks)} chunks")
-    print(f"SQLite DB: {args.sqlite_path}")
-    print(f"FAISS index: {args.faiss_path}")
-    print(f"Embedding model: {args.model_name}")
+    print(f"\n✅ Done.")
+    print(f"   Chunks  : {len(raw_chunks)}")
+    print(f"   SQLite  : {args.sqlite_path}")
+    print(f"   FAISS   : {args.faiss_path}")
+    print(f"   Model   : {args.model_name}")
 
 
 if __name__ == "__main__":
