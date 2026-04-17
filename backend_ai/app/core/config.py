@@ -19,7 +19,12 @@ load_dotenv()
 
 # Base directories
 BASE_DIR = Path(__file__).resolve().parents[3]
-DB_DIR = BASE_DIR / "data_pipeline" / "db_setup"
+
+# For Docker/Railway deployment, check if running in container
+if os.path.exists("/app/data_pipeline"):
+    DB_DIR = Path("/app/data_pipeline/db_setup")
+else:
+    DB_DIR = BASE_DIR / "data_pipeline" / "db_setup"
 
 logger = logging.getLogger(__name__)
 
