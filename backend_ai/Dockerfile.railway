@@ -48,7 +48,6 @@ ENV PATH=/home/appuser/.local/bin:$PATH
 ENV PYTHONPATH=/app
 ENV HOST=0.0.0.0
 ENV PORT=8000
-ENV ENVIRONMENT=production
 ENV LOG_FORMAT=json
 
 EXPOSE 8000

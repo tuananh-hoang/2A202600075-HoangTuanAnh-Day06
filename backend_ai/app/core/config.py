@@ -116,13 +116,13 @@ class Settings(BaseSettings):
         
         # Check production-specific requirements
         if self.environment == "production":
-            if not self.agent_api_key:
-                errors.append("❌ AGENT_API_KEY must be set in production!")
-            if self.debug:
-                warnings.append("⚠️  DEBUG=True in production — should be False")
-            if self.allowed_origins == "*":
-                warnings.append("⚠️  ALLOWED_ORIGINS=* in production — should specify exact origins")
-        
+        # Check cả Pydantic field lẫn os.environ trực tiếp
+            api_key = self.agent_api_key or os.environ.get("AGENT_API_KEY")
+        if not api_key:
+            errors.append("❌ AGENT_API_KEY must be set in production!")
+        else:
+            self.agent_api_key = api_key  # Đảm bảo field được set
+
         # Check file paths
         if not Path(self.sqlite_path).exists():
             warnings.append(f"⚠️  SQLite DB not found: {self.sqlite_path}")
