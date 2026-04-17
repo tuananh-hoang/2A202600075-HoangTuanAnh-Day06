@@ -42,6 +42,13 @@ RUN mkdir -p /app/data_pipeline/db_setup && \
     chmod +x /app/start.sh /app/start.py && \
     chown -R appuser:appuser /app
 
+# Thêm TRƯỚC dòng "USER appuser"
+RUN mkdir -p /app/.cache/huggingface \
+             /app/.cache/transformers \
+             /app/.cache/sentence_transformers \
+    && chown -R appuser:appuser /app/.cache
+
+USER appuser
 USER appuser
 
 ENV PATH=/home/appuser/.local/bin:$PATH
