@@ -1,5 +1,7 @@
 FROM python:3.11-slim AS builder
 WORKDIR /build
+
+# Cài đặt các thư viện cần thiết để build (FAISS, SQLite, v.v.)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc g++ libgomp1 \
     && rm -rf /var/lib/apt/lists/*
@@ -7,10 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend_ai/requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-# ✅ Pre-download model
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')"
+# ĐÃ XÓA: Lệnh tải model SentenceTransformer ở đây
 
 FROM python:3.11-slim AS runtime
+# libgomp1 vẫn có thể cần thiết cho faiss-cpu
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 curl \
     && rm -rf /var/lib/apt/lists/*
@@ -19,9 +21,10 @@ RUN groupadd -r appuser && useradd -r -g appuser -u 1000 appuser
 
 WORKDIR /app
 
+# Copy các thư viện Python đã cài đặt từ builder
 COPY --from=builder /root/.local /home/appuser/.local
-# ✅ Copy model cache + fix permission TRƯỚC khi switch user
-COPY --from=builder /root/.cache /home/appuser/.cache
+
+# ĐÃ XÓA: Copy thư mục .cache vì không còn lưu model offline nữa
 RUN chown -R appuser:appuser /home/appuser
 
 COPY backend_ai/app/ /app/app/
