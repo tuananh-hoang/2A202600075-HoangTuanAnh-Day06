@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     # ==========================================
     sqlite_path: str = str(DB_DIR / "knowledge_base.sqlite")
     faiss_path: str = str(DB_DIR / "knowledge_base.faiss")
-    embedding_model: str = "all-MiniLM-L6-v2"
+    embedding_model: str = "text-embedding-3-small"
     retrieval_top_k: int = 5
     rerank_top_k: int = 5
     
