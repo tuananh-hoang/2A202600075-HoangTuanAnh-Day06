@@ -117,7 +117,7 @@ def _build_messages_with_history(
 
 def classify_node(state: AgentState) -> dict:
     messages = _build_messages_with_history(CLASSIFY_PROMPT, state, max_turns=4)
-    response = llm.invoke(messages)
+    response = get_llm().invoke(messages)
     try:
         parsed              = _extract_json(response.content)
         user_persona        = parsed.get("user_persona", "driver")
@@ -149,7 +149,7 @@ def classify_node(state: AgentState) -> dict:
 
 def rephrase_node(state: AgentState) -> dict:
     messages = _build_messages_with_history(REPHRASE_PROMPT, state, max_turns=4)
-    response = llm.invoke(messages)
+    response = get_llm().invoke(messages)
     try:
         parsed = _extract_json(response.content)
         search_query = parsed.get("search_query", _get_user_query(state))
@@ -215,7 +215,7 @@ def answer_node(state: AgentState) -> dict:
     messages_to_send = history_messages[:-1] + [
         HumanMessage(content=user_msg_with_context)
     ]
-    response = llm.invoke(messages_to_send)
+    response = get_llm().invoke(messages_to_send)
     try:
         parsed           = _extract_json(response.content)
         answer           = parsed.get("answer", "")
@@ -260,7 +260,7 @@ def escalate_node(state: AgentState) -> dict:
     messages[-1] = HumanMessage(
         content=f"Câu hỏi: {query}\n\n{context_hint}"
     )
-    response = llm.invoke(messages)
+    response = get_llm().invoke(messages)
     escalate_answer = response.content
     logger.info("escalate_node: persona=%s triggered", persona)
     return {
