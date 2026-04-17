@@ -101,45 +101,32 @@ class Settings(BaseSettings):
         case_sensitive = False  # Allow AGENT_API_KEY to map to agent_api_key
         env_file_encoding = "utf-8"
         case_sensitive = False
-        
     def validate_production(self) -> None:
-        """
-        Validation cho production environment.
-        Fail fast nếu thiếu config quan trọng.
-        """
         warnings = []
         errors = []
         
-        # Check OpenAI API key
         if not self.openai_api_key:
             warnings.append("⚠️  OPENAI_API_KEY not set — using mock LLM")
         
-        # Check production-specific requirements
         if self.environment == "production":
-        # Check cả Pydantic field lẫn os.environ trực tiếp
-            api_key = self.agent_api_key or os.environ.get("AGENT_API_KEY")
-        if not api_key:
-            errors.append("❌ AGENT_API_KEY must be set in production!")
-        else:
-            self.agent_api_key = api_key  # Đảm bảo field được set
-
-        # Check file paths
-        if not Path(self.sqlite_path).exists():
-            warnings.append(f"⚠️  SQLite DB not found: {self.sqlite_path}")
-        if not Path(self.faiss_path).exists():
-            warnings.append(f"⚠️  FAISS index not found: {self.faiss_path}")
+            # Đọc thẳng từ os.environ để tránh Pydantic không nhận
+            agent_key = self.agent_api_key or os.environ.get("AGENT_API_KEY") or ""
+            if not agent_key:
+                errors.append("❌ AGENT_API_KEY must be set in production!")
+                
+            if self.debug:
+                warnings.append("⚠️  DEBUG=True in production")
+            if self.allowed_origins == "*":
+                warnings.append("⚠️  ALLOWED_ORIGINS=* in production")
         
-        # Log warnings
         for warning in warnings:
             logger.warning(warning)
         
-        # Raise errors
         if errors:
             error_msg = "\n".join(errors)
             raise ValueError(f"Configuration validation failed:\n{error_msg}")
         
         logger.info(f"✅ Configuration validated for environment: {self.environment}")
-    
     def get_allowed_origins_list(self) -> list[str]:
         """Parse ALLOWED_ORIGINS string to list."""
         if self.allowed_origins == "*":
