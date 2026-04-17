@@ -49,7 +49,6 @@ RUN mkdir -p /app/.cache/huggingface \
     && chown -R appuser:appuser /app/.cache
 
 USER appuser
-USER appuser
 
 ENV PATH=/home/appuser/.local/bin:$PATH
 ENV PYTHONPATH=/app
