@@ -311,4 +311,10 @@ def get_xanh_sm_retriever(
     )
 
 
-list_of_tools = [get_xanh_sm_retriever()]
+_retriever_tool_cache = None
+
+def get_tools() -> list:
+    global _retriever_tool_cache
+    if _retriever_tool_cache is None:
+        _retriever_tool_cache = [get_xanh_sm_retriever()]
+    return _retriever_tool_cache

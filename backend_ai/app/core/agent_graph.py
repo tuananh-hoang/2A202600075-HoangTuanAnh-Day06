@@ -21,7 +21,7 @@ from app.core import config
 from app.prompts.system_prompt import XANH_SM_SYSTEM_PROMPT
 
 # ── Dùng list_of_tools từ retrieval_advanced thay vì vector_tools ──
-from app.utils.retrieval_advanced import list_of_tools
+from app.utils.retrieval_advanced import get_tools()
 
 
 # ──────────────────────────────────────────────
