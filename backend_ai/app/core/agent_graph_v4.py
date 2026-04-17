@@ -52,8 +52,11 @@ class AgentState(TypedDict):
 # ──────────────────────────────────────────────
 # LLM + RETRIEVER
 # ──────────────────────────────────────────────
+_llm = ChatOpenAI(
+    model=config.LLM_MODEL,
+    temperature=config.AI_TEMPERATURE,
+)
 
-_llm: ChatOpenAI | None = None
 _retriever: HybridRAGRetriever | None = None
 
 def get_llm() -> ChatOpenAI:

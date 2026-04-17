@@ -123,7 +123,7 @@ class HybridRAGRetriever(BaseRetriever):
         super().__init__(**kwargs)
 
         # OpenAI client — dùng key từ config (OPENAI_API_KEY env var)
-        self._client = OpenAI(api_key=config.OPENAI_API_KEY)
+        self._client = OpenAI()
 
         # Load FAISS index
         self._faiss_index = faiss.read_index(self.faiss_path)
